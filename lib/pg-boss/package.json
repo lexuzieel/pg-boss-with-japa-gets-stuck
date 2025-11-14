@@ -1,0 +1,72 @@
+{
+  "name": "pg-boss",
+  "version": "12.1.1",
+  "description": "Queueing jobs in Postgres from Node.js like a boss",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "cron-parser": "^5.4.0",
+    "pg": "^8.16.3",
+    "serialize-error": "^12.0.0"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@tsconfig/node22": "^22.0.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.6",
+    "eslint": "^9.39.1",
+    "luxon": "^3.7.2",
+    "mocha": "^11.7.5",
+    "neostandard": "^0.12.2",
+    "nyc": "^17.1.0",
+    "source-map-support": "^0.5.21",
+    "tsdown": "^0.16.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "prepublishOnly": "npm test && npm run build",
+    "test": "eslint . && mocha test/**/*.ts",
+    "cover": "nyc npm test",
+    "tsc": "tsc --noEmit",
+    "readme": "node ./examples/readme.js",
+    "db:migrate": "node --import=tsx -e 'console.log(require(\"./src\").getMigrationPlans())'",
+    "db:construct": "node --import=tsx -e 'console.log(require(\"./src\").getConstructionPlans())'"
+  },
+  "pgboss": {
+    "schema": 26
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timgit/pg-boss.git"
+  },
+  "keywords": [
+    "postgresql",
+    "postgres",
+    "queue",
+    "job"
+  ],
+  "author": "timgit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timgit/pg-boss/issues"
+  },
+  "homepage": "https://timgit.github.io/pg-boss",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ]
+}
