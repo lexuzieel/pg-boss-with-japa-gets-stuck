@@ -32,6 +32,7 @@ interface DatabaseOptions {
   connectionString?: string;
   max?: number;
   db?: IDatabase;
+  connectionTimeoutMillis?: number;
 }
 interface SchedulingOptions {
   schedule?: boolean;
@@ -187,10 +188,10 @@ interface StopOptions {
   close?: boolean;
   graceful?: boolean;
   timeout?: number;
-  wait?: boolean;
 }
 interface OffWorkOptions {
-  id: string;
+  id?: string;
+  wait?: boolean;
 }
 type UpdateQueueOptions = Omit<Queue, 'name' | 'partition' | 'policy'>;
 interface Warning {
@@ -250,8 +251,7 @@ declare class PgBoss extends EventEmitter<PgBossEventMap> {
     includeMetadata: true;
   }, handler: WorkWithMetadataHandler<ReqData>): Promise<string>;
   work<ReqData>(name: string, options: WorkOptions, handler: WorkHandler<ReqData>): Promise<string>;
-  offWork(name: string): Promise<void>;
-  offWork(options: OffWorkOptions): Promise<void>;
+  offWork(name: string, options?: OffWorkOptions): Promise<void>;
   notifyWorker(workerId: string): void;
   subscribe(event: string, name: string): Promise<void>;
   unsubscribe(event: string, name: string): Promise<void>;
