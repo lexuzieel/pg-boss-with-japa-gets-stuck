@@ -35,17 +35,19 @@ test.group('pg-boss', () => {
 
     await boss.start()
 
-    let inProgressJobs = 0
     const workFor = 4e3 // work is being done for 4 seconds
     const timeout = 3e3 // jobs should be dropped after 3 seconds
 
-    await boss.work('test-queue', async () => {
-      inProgressJobs++
+    let jobWasProcessed = false
+
+    const handler = async () => {
       console.log(`[WORKER] processing job for ${workFor / 1000} seconds`)
       await new Promise((resolve) => setTimeout(resolve, workFor))
       console.log(`[WORKER] job completed`)
-      inProgressJobs--
-    })
+      jobWasProcessed = true
+    }
+
+    await boss.work('test-queue', handler)
 
     await boss.createQueue('test-queue')
 
@@ -58,9 +60,9 @@ test.group('pg-boss', () => {
      * When graceful is true, jobs should be dropped after timeout.
      * Currently, it looks like work is still being done after timeout,
      * whilst the connection to the database is closed.
-     * 
+     *
      * Because of this, pg-boss emits error like this:
-     * 
+     *
      *   message: 'Database connection is not opened (Queue: test-queue, Worker: <id>)',
      *   stack: 'AssertionError [ERR_ASSERTION]: Database connection is not opened\n' +
      *     '    at Manager.assertDb (.../pg-boss/src/manager.ts:668:16)\n' +
@@ -73,6 +75,10 @@ test.group('pg-boss', () => {
       timeout,
     })
 
-    assert.equal(inProgressJobs, 0, `jobs should be dropped after ${timeout / 1000} seconds`)
+    const waitForJobHandlerToFinish = workFor - timeout + 100
+
+    await new Promise((resolve) => setTimeout(resolve, waitForJobHandlerToFinish))
+
+    assert.equal(jobWasProcessed, false, `job should have been dropped prematurely`)
   })
 })
